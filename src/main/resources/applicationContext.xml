@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="connectionFectory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="tcp://localhost:61616"></property>
+	</bean>
+	
+	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="messageQueue" />
+	</bean>
+	
+	<bean id="topicDestination" class="org.apache.activemq.command.ActiveMQTopic">
+		<constructor-arg value="messageTopic" />
+	</bean>
+	
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="connectionFectory" />	
+	</bean>
+	
+	<bean id="jmsQueueListner" class="com.vinu.jms.queue.QueueListner">			
+	</bean>
+	
+	<bean id="sender" class="com.vinu.jms.queue.MessageSender">
+		<property name="jmsTemplate" ref="jmsTemplate" />	
+		<property name="destination" ref="queueDestination" />			
+	</bean>
+	
+	<bean id="reciever" class="com.vinu.jms.queue.MessageReciever">
+		<property name="jmsTemplate" ref="jmsTemplate" />	
+		<property name="destination" ref="queueDestination" />			
+	</bean>	
+		
+	<bean id="queueListner" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFectory"/>
+		<property name="destination" ref="queueDestination"/>
+		<property name="messageListener" ref="jmsQueueListner"/>
+	</bean>
+	
+
+</beans>
